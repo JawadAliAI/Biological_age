@@ -55,8 +55,7 @@ def predict_premium(data: UserInput):
             status_code=200,
             content={
                 "message": "Prediction successful ✅",
-                "Predicted Biological Age of Patient": prediction_value,
-                "input_received": data.dict()  # Echo user input for clarity
+                "Predicted Biological Age of Patient": prediction_value
             }
         )
     except Exception as e:
@@ -64,3 +63,4 @@ def predict_premium(data: UserInput):
             status_code=500,
             content={"error": str(e), "trace": traceback.format_exc()}
         )
+
