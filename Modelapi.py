@@ -24,7 +24,6 @@ def predict(data: InputData):
         return {"prediction": prediction.tolist()}
     except Exception as e:
         return {"error": str(e)}
-this work perfectikly but i want the out put of my code like this one 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, computed_field
@@ -92,3 +91,4 @@ def predict_premium(data: UserInput):
         )
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
