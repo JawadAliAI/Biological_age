@@ -36,7 +36,7 @@ import traceback
 from fastapi.middleware.cors import CORSMiddleware
 
 # Path to your saved pickle file
-model_path = "xgb_model_reg.pkl"  
+model_path = "model.pkl"  
 
 # Load the model
 model = joblib.load(model_path)
@@ -91,4 +91,5 @@ def predict_premium(data: UserInput):
         )
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
