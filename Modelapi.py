@@ -17,7 +17,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS (so frontend apps can call the API)
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, specify domains
@@ -25,18 +25,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Pydantic model with user input fields
+# Pydantic model with dataset-based input structure
 class UserInput(BaseModel):
-    age: Annotated[int, Field(gt=0, description="Age of the Patient")]
-    albumin_gL: Annotated[float, Field(gt=0, description="Quantity of Albumin in gL")]
-    creat_umol: Annotated[float, Field(gt=0, description="Quantity of Creatinine in umol")]
-    glucose_mmol: Annotated[float, Field(gt=0, description="Quantity of Glucose in mmol")]
-    lncrp: Annotated[float, Field(gt=0, description="Log of CRP")]
-    lymph: Annotated[float, Field(gt=0, description="Lymphocytes")]
-    mcv: Annotated[float, Field(gt=0, description="Mean Corpuscular Volume")]
-    rdw: Annotated[float, Field(gt=0, description="Red Cell Distribution Width")]
-    alp: Annotated[float, Field(gt=0, description="Alkaline Phosphatase")]
-    wbc: Annotated[float, Field(gt=0, description="White Blood Cell Count")]
+    Albumin_gL: Annotated[float, Field(gt=0, description="Quantity of Albumin in g/L")]
+    Creatinine_umolL: Annotated[float, Field(gt=0, description="Quantity of Creatinine in umol/L")]
+    Glucose_mmolL: Annotated[float, Field(gt=0, description="Quantity of Glucose in mmol/L")]
+    CRP_mg_dL: Annotated[float, Field(gt=0, description="C-Reactive Protein in mg/dL")]
+    Lymphocyte_percent: Annotated[float, Field(gt=0, description="Lymphocyte percentage (%)")]
+    MCV_fL: Annotated[float, Field(gt=0, description="Mean Corpuscular Volume (fL)")]
+    RDW_percent: Annotated[float, Field(gt=0, description="Red Cell Distribution Width (%)")]
+    ALKP_U_L: Annotated[float, Field(gt=0, description="Alkaline Phosphatase in U/L")]
+    WBC_10_9_L: Annotated[float, Field(gt=0, description="White Blood Cells (10^9/L)")]
+    ChronicAge: Annotated[float, Field(gt=0, description="Chronological Age of Patient")]
 
 @app.get("/")
 def root():
@@ -55,7 +55,8 @@ def predict_premium(data: UserInput):
             status_code=200,
             content={
                 "message": "Prediction successful ✅",
-                "Predicted Biological Age of Patient": prediction_value
+                "Predicted Biological Age of Patient": prediction_value,
+                "input_received": data.dict()
             }
         )
     except Exception as e:
@@ -63,4 +64,3 @@ def predict_premium(data: UserInput):
             status_code=500,
             content={"error": str(e), "trace": traceback.format_exc()}
         )
-
