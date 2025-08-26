@@ -73,9 +73,8 @@ def predict(data: InputData):
         prediction = model.predict(features)
 
         return {
-            "input": data.dict(),
-            "scaled": scaler is not None,
             "predicted_biological_age": prediction.tolist()
         }
     except Exception as e:
         return {"error": str(e)}
+
