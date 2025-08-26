@@ -3,11 +3,26 @@ from pydantic import BaseModel
 import pickle
 import numpy as np
 
+# ---------------------------------------------------
 # Load your trained model
+# ---------------------------------------------------
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
+# ---------------------------------------------------
+# Load the scaler
+# ---------------------------------------------------
+try:
+    with open("scaler.pkl", "rb") as f:
+        scaler = pickle.load(f)
+    print("Scaler loaded successfully!")
+except Exception as e:
+    print(f"Error loading scaler: {e}")
+    scaler = None
+
+# ---------------------------------------------------
 # Initialize FastAPI with metadata
+# ---------------------------------------------------
 app = FastAPI(
     title="Biological Age Prediction API",
     description="This API predicts the **Biological Age of a Patient** using clinical input values.",
@@ -50,11 +65,16 @@ def predict(data: InputData):
             data.ChronicAge
         ]])
 
+        # Scale the features if scaler is available
+        if scaler is not None:
+            features = scaler.transform(features)
+
         # Predict
         prediction = model.predict(features)
 
         return {
             "input": data.dict(),
+            "scaled": scaler is not None,
             "predicted_biological_age": prediction.tolist()
         }
     except Exception as e:
