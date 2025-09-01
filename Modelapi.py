@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 
 # ---------------------------------------------------
-# Load your trained model
+# Load trained model
 # ---------------------------------------------------
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
@@ -25,44 +25,50 @@ except Exception as e:
 # ---------------------------------------------------
 app = FastAPI(
     title="Biological Age Prediction API",
-    description="This API predicts the **Biological Age of a Patient** using clinical input values.",
+    description="This API predicts the Biological Age of a Patient using clinical input values.",
     version="1.0.0"
 )
 
-# Define input schema
+# ---------------------------------------------------
+# Input schema (no restrictions, user can enter any float)
+# ---------------------------------------------------
 class InputData(BaseModel):
-    Albumin_gL: float
-    Creatinine_umolL: float
-    Glucose_mmolL: float
-    CRP_mg_dL: float
-    Lymphocyte_percent: float
-    MCV_fL: float
-    RDW_percent: float
-    ALKP_U_L: float
-    WBC_10_9_L: float
-    ChronicAge: float
+    albumin_gl: float
+    creatinine_umoll: float
+    glucose_mmoll: float
+    crp_mgdl: float
+    lymphocyte_percent: float
+    mcv_fl: float
+    rdw_percent: float
+    alkp_ul: float
+    wbc_10_9l: float
+    chronic_age: float
 
+# ---------------------------------------------------
 # Root endpoint
+# ---------------------------------------------------
 @app.get("/")
 def root():
     return {"status": "API is running 🚀"}
 
+# ---------------------------------------------------
 # Prediction endpoint
+# ---------------------------------------------------
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        # Convert input to numpy array in correct order
+        # Convert input to numpy array in correct order (same as training!)
         features = np.array([[ 
-            data.Albumin_gL,
-            data.Creatinine_umolL,
-            data.Glucose_mmolL,
-            data.CRP_mg_dL,
-            data.Lymphocyte_percent,
-            data.MCV_fL,
-            data.RDW_percent,
-            data.ALKP_U_L,
-            data.WBC_10_9_L,
-            data.ChronicAge
+            data.albumin_gl,
+            data.creatinine_umoll,
+            data.glucose_mmoll,
+            data.crp_mgdl,
+            data.lymphocyte_percent,
+            data.mcv_fl,
+            data.rdw_percent,
+            data.alkp_ul,
+            data.wbc_10_9l,
+            data.chronic_age
         ]])
 
         # Scale the features if scaler is available
@@ -70,11 +76,11 @@ def predict(data: InputData):
             features = scaler.transform(features)
 
         # Predict
-        prediction = model.predict(features)
+        prediction = model.predict(features)[0]  # single value
 
         return {
-            "predicted_biological_age": prediction.tolist()
+            "predicted_biological_age": float(prediction),
+            "status": "Success"
         }
     except Exception as e:
         return {"error": str(e)}
-
